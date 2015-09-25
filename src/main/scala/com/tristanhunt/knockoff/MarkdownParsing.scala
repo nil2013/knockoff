@@ -122,12 +122,12 @@ class ChunkParser extends RegexParsers with StringExtras {
     }
 
   def textLineWithEnd: Parser[Chunk] =
-    """[\t ]*\S[^\n]*[^ \n][ ]?\n""".r ^^ {
+    """[\t ]*\S[^\n]*[^ \n][ ]?\r?\n""".r ^^ {
       str => TextChunk(str)
     }
 
   def hardBreakTextLine: Parser[Chunk] =
-    """[\t ]*\S[^\n]*[ ]{2}\n""".r ^^ {
+    """[\t ]*\S[^\n]*[ ]{2}\r?\n""".r ^^ {
       s => TextChunk(s)
     }
 
@@ -199,16 +199,16 @@ class ChunkParser extends RegexParsers with StringExtras {
   def setextHeaderDashes: Parser[Chunk] =
     textLine <~ dashesLine ^^ (s => HeaderChunk(2, s.content.trim))
 
-  def equalsLine: Parser[Any] = """=+\n""".r
+  def equalsLine: Parser[Any] = """=+\r?\n""".r
 
-  def dashesLine: Parser[Any] = """-+\n""".r
+  def dashesLine: Parser[Any] = """-+\r?\n""".r
 
   def atxHeader: Parser[Chunk] =
     """#+ .*\n?""".r ^^ (
       s => HeaderChunk(s.countLeading('#'), s.trimChars('#').trim))
 
   def horizontalRule: Parser[Chunk] =
-    """[ ]{0,3}[*\-_][\t ]?[*\-_][\t ]?[*\-_][\t *\-_]*\n""".r ^^ {
+    """[ ]{0,3}[*\-_][\t ]?[*\-_][\t ]?[*\-_][\t *\-_]*\r?\n""".r ^^ {
       s => HorizontalRuleChunk
     }
 
@@ -230,7 +230,7 @@ class ChunkParser extends RegexParsers with StringExtras {
     """^>[\t ]?""".r ~> (textLine | emptyLine)
 
   def linkDefinition: Parser[Chunk] =
-    linkIDAndURL ~ opt(linkTitle) <~ """[ ]*\n?""".r ^^ {
+    linkIDAndURL ~ opt(linkTitle) <~ """[ ]*\r?\n?""".r ^^ {
       case ~(idAndURL, titleOpt) =>
         LinkDefinitionChunk(idAndURL._1, idAndURL._2, titleOpt)
     }
